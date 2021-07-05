@@ -93,11 +93,12 @@
 #define PSIMPL_GENERIC
 
 
-#include <queue>
-#include <stack>
-#include <numeric>
 #include <algorithm>
 #include <cmath>
+#include <functional>
+#include <numeric>
+#include <queue>
+#include <stack>
 
 
 /*!
@@ -437,7 +438,7 @@ namespace psimpl
             stats.max = static_cast <double> (*std::max_element (first, last));
             stats.sum = static_cast <double> (std::accumulate (first, last, init));
             stats.mean = stats.sum / count;
-            std::transform (first, last, first, std::bind2nd (std::minus <value_type> (), stats.mean));
+            std::transform (first, last, first, std::bind (std::minus <value_type> (), std::placeholders::_1, stats.mean));
             stats.std = std::sqrt (static_cast <double> (std::inner_product (first, last, first, init)) / count);
             return stats;
         }
@@ -1334,7 +1335,7 @@ namespace psimpl
 
             std::transform (errors.get (), errors.get () + errorCount,
                             errors.get (),
-                            std::ptr_fun <double, double> (std::sqrt));
+                            std::cref<double(double)>(std::sqrt));
 
             return math::compute_statistics (errors.get (), errors.get () + errorCount);
         }
